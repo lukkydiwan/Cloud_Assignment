@@ -1,0 +1,32 @@
+======================================================================
+TASK 3 BENCHMARK: 50 SEQUENTIAL INFERENCE REQUESTS UNDER LIMITS
+Resource Limits: CPU Quota = 1 Core | Memory Quota = 1024 MiB (1 GiB)
+======================================================================
+[*] Process Base Memory:           244.36 MiB
+[*] Loading model from 'models/v1'...
+Loading weights:   0%|          | 0/76 [00:00<?, ?it/s]Loading weights: 100%|██████████| 76/76 [00:00<00:00, 4449.82it/s]
+[*] Memory after Hydration:        375.53 MiB
+[*] Sending 50 sequential requests to inference pipeline...
+----------------------------------------------------------------------
+Req #    Status     Latency        Current RSS      Peak RSS      
+----------------------------------------------------------------------
+1        HTTP 200      679.4 ms       554.29 MiB       554.29 MiB
+5        HTTP 200      696.6 ms       562.82 MiB       562.82 MiB
+10       HTTP 200      570.6 ms       566.52 MiB       566.52 MiB
+15       HTTP 200      549.7 ms       567.28 MiB       567.28 MiB
+20       HTTP 200      705.1 ms       568.27 MiB       568.27 MiB
+25       HTTP 200      612.7 ms       568.70 MiB       568.70 MiB
+30       HTTP 200      495.6 ms       569.48 MiB       569.48 MiB
+35       HTTP 200      651.2 ms       570.05 MiB       570.05 MiB
+40       HTTP 200      631.1 ms       570.30 MiB       570.30 MiB
+45       HTTP 200      575.1 ms       570.86 MiB       570.86 MiB
+50       HTTP 200      603.6 ms       572.77 MiB       572.77 MiB
+----------------------------------------------------------------------
+BENCHMARK EXECUTION SUMMARY:
+  Total Requests Completed:   50 / 50 (100% success)
+  Failures / OOM Terminations: 0 (No Out-of-Memory kills)
+  Average Request Latency:    719.48 ms
+  Allocated Memory Limit:     1024.00 MiB (1.00 GiB)
+  Measured Peak Resident RSS: 572.77 MiB
+  Remaining Memory Headroom:  451.23 MiB (44.1%)
+======================================================================

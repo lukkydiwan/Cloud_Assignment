@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pipeline
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: worker-shard-0
+  namespace: pipeline
+spec:
+  template:
+    metadata:
+      labels:
+        app: teacher-worker
+        shard: "0"
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: worker
+          image: cloud-worker:v1
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SHARD_INDEX
+              value: "0"
+            - name: SHARD_COUNT
+              value: "2"
+            - name: OLLAMA_ENDPOINT
+              value: "http://host.k3d.internal:11434"
+            - name: S3_ENDPOINT
+              value: "http://seaweedfs-s3.data.svc.cluster.local:8333"
+            - name: S3_BUCKET
+              value: "datasets"
+            - name: COMMANDS_PATH
+              value: "/tmp/commands_pool.jsonl"
+            - name: PROMPT_PATH
+              value: "/app/prompts/teacher_prompt.txt"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: worker-shard-1
+  namespace: pipeline
+spec:
+  template:
+    metadata:
+      labels:
+        app: teacher-worker
+        shard: "1"
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: worker
+          image: cloud-worker:v1
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SHARD_INDEX
+              value: "1"
+            - name: SHARD_COUNT
+              value: "2"
+            - name: OLLAMA_ENDPOINT
+              value: "http://host.k3d.internal:11434"
+            - name: S3_ENDPOINT
+              value: "http://seaweedfs-s3.data.svc.cluster.local:8333"
+            - name: S3_BUCKET
+              value: "datasets"
+            - name: COMMANDS_PATH
+              value: "/tmp/commands_pool.jsonl"
+            - name: PROMPT_PATH
+              value: "/app/prompts/teacher_prompt.txt"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

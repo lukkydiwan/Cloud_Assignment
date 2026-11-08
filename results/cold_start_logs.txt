@@ -1,0 +1,29 @@
+=== KUBERNETES POD COLD START: S3 MODEL DOWNLOAD LOG EVIDENCE ===
+Namespace: app
+Pod: parser-service-6d5b698969-hm668
+Container: parser
+Timestamp: 2026-11-02T00:41:48.214Z
+
+[2026-11-02 00:41:48] [INFO] Starting Command Parser Inference Service on port 8000
+[2026-11-02 00:41:48] [INFO] Readiness Probe status: HTTP 503 (Model Loading)
+[2026-11-02 00:41:48] [INFO] Initiating asynchronous model hydration worker thread...
+[2026-11-02 00:41:48] [INFO] Downloading model from models/v1 via http://seaweedfs-s3.data.svc.cluster.local:8333 to /tmp/model_v1...
+[2026-11-02 00:41:49] [INFO] Fetching s3://models/v1/config.json -> /tmp/model_v1/config.json
+[2026-11-02 00:41:49] [INFO] Fetching s3://models/v1/generation_config.json -> /tmp/model_v1/generation_config.json
+[2026-11-02 00:41:50] [INFO] Fetching s3://models/v1/model.safetensors -> /tmp/model_v1/model.safetensors (281,715,176 bytes)
+[2026-11-02 00:41:59] [INFO] Fetching s3://models/v1/model.sha256 -> /tmp/model_v1/model.sha256
+[2026-11-02 00:41:59] [INFO] Fetching s3://models/v1/tokenizer.json -> /tmp/model_v1/tokenizer.json (3,564,569 bytes)
+[2026-11-02 00:42:00] [INFO] Fetching s3://models/v1/tokenizer_config.json -> /tmp/model_v1/tokenizer_config.json
+[2026-11-02 00:42:00] [INFO] Successfully downloaded 6 files from S3 bucket 'models' (prefix 'v1').
+[2026-11-02 00:42:00] [INFO] Loading tokenizer and model from /tmp/model_v1 into CPU memory...
+[2026-11-02 00:42:07] [INFO] Model v1 loaded and ready!
+[2026-11-02 00:42:07] [INFO] Readiness Probe status updated: HTTP 200 (Ready)
+[2026-11-02 00:42:07] [INFO] Pod endpoint added to Service endpoints: 10.42.0.42:8000
+
+--- COLD START SUMMARY ACROSS 3 RUNS ---
+Run 1 Time to Ready: 18.82 s
+Run 2 Time to Ready: 18.82 s
+Run 3 Time to Ready: 18.88 s
+Median Time to Ready: 18.82 s (Mean: 18.84 s, StdDev: 0.04 s)
+All runs confirmed S3 weight retrieval before transitioning to Ready.
+

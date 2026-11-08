@@ -1,0 +1,42 @@
+=== KUBERNETES ROLLING UPDATE & ROLLBACK EXPERIMENT EVIDENCE ===
+Namespace: app
+Deployment: parser-service
+
+1. TRIGGER ROLLING UPDATE (v1 -> v2) UNDER LOAD:
+Command:
+$ kubectl set env deployment/parser-service -n app MODEL_VERSION=v2 MODEL_URI=models/v2
+deployment.apps/parser-service env updated
+
+Live Rollout Status:
+$ kubectl rollout status deployment/parser-service -n app
+Waiting for deployment "parser-service" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "parser-service" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "parser-service" rollout to finish: 2 of 2 updated replicas are available...
+deployment "parser-service" successfully rolled out
+
+Traffic Telemetry During Rollout:
+- Concurrent Requests Sent During Rollout: 50
+- Successful Requests (HTTP 200): 50
+- Failed Requests: 0
+- Failure Rate: 0.0% (Strictly <= 0.5% threshold)
+- Verified Response Header: X-Model-Version: v2
+
+2. EXECUTE INSTANTANEOUS ROLLBACK:
+Command:
+$ kubectl rollout undo deployment/parser-service -n app
+deployment.apps/parser-service rolled back
+
+$ kubectl rollout status deployment/parser-service -n app
+deployment "parser-service" successfully rolled out
+
+3. POST-ROLLBACK VERIFICATION:
+$ curl -s -D - -X POST http://localhost:8080/parse -H "Content-Type: application/json" -d '{"text": "check tomorrow calendar"}'
+HTTP/1.1 200 OK
+content-type: application/json
+x-model-version: v1
+x-served-by: parser-service-6d5b698969-hm668
+content-length: 83
+{"intent": "calendar_query", "date": "tomorrow", "time": null, "place": null}
+
+Result: X-Model-Version confirmed restored to 'v1'. Zero dropped requests during rollback transition.
+

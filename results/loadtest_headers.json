@@ -1,0 +1,9 @@
+{
+  "per_replica": {
+    "parser-service-6d5b698969-xgl77": 31,
+    "parser-service-6d5b698969-hm668": 27
+  },
+  "per_model_version": {
+    "v1": 58
+  }
+}

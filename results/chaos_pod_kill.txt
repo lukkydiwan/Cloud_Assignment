@@ -1,0 +1,1 @@
+Pod Kill Recovery Time: 18.93 s

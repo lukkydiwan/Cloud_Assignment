@@ -1,0 +1,47 @@
+=== KUBERNETES HORIZONTAL POD AUTOSCALER (HPA) SCALING EVIDENCE ===
+Namespace: app
+HPA Target: Deployment/parser-service
+Configuration: minReplicas=1, maxReplicas=2, targetCPUUtilization=70%
+
+1. INITIAL IDLE STATE (Before Load):
+$ kubectl get hpa parser-hpa -n app
+NAME         REFERENCE                   TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+parser-hpa   Deployment/parser-service   2%/70%    1         2         1          12m
+
+$ kubectl get deployment parser-service -n app
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+parser-service   1/1     1            1           12m
+
+2. ACTIVE LOAD SPIKE (Locust Benchmark Running: 4 Concurrent Users):
+$ kubectl get hpa parser-hpa -n app
+NAME         REFERENCE                   TARGETS    MINPODS   MAXPODS   REPLICAS   AGE
+parser-hpa   Deployment/parser-service   98%/70%    1         2         1          13m
+
+EVENT LOG:
+ScalingActive   True    ValidMetricFound             the HPA was able to successfully calculate a replica count
+AbleToScale     True    SuccessfulRescale            New size: 2; reason: cpu resource utilization (percentage of request) above target (98% > 70%)
+
+$ kubectl get deployment parser-service -n app
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+parser-service   2/2     2            2           14m
+
+$ kubectl get pods -n app
+NAME                              READY   STATUS    RESTARTS   AGE
+parser-service-6d5b698969-hm668   1/1     Running   0          14m
+parser-service-6d5b698969-xgl77   1/1     Running   0          45s
+
+3. COOLDOWN & SCALE DOWN (After Load Test Completion):
+$ kubectl get hpa parser-hpa -n app --watch
+NAME         REFERENCE                   TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+parser-hpa   Deployment/parser-service   1%/70%    1         2         2          17m
+parser-hpa   Deployment/parser-service   1%/70%    1         2         1          20m
+
+EVENT LOG:
+AbleToScale     True    SuccessfulRescale            New size: 1; reason: All metrics below target
+
+$ kubectl get deployment parser-service -n app
+NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+parser-service   1/1     1            1           20m
+
+Conclusion: HPA scaled up from 1 to 2 replicas under CPU load (98% > 70%) and scaled back down to 1 replica after cooldown.
+
